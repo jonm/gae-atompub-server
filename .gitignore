@@ -34,3 +34,7 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
+
+target/
+src/main/app.yaml
+src/main/build.py
