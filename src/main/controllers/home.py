@@ -12,15 +12,30 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+import mimeparse.mimeparse as mimeparse
 import os
 import webapp2
 
 from google.appengine.ext.webapp import template
 
+import servicedoc
+
 class HomeHandler(webapp2.RequestHandler):
     def get(self):
-        self.response.headers['Content-Type'] = 'text/html;charset=utf-8'
-        self.response.write(template.render(os.path.join(os.path.dirname(__file__),
-                                     "..",
-                                     "templates",
-                                     "home.html"), {}))
+        supported_mtypes = ['application/atomsvc+xml',
+                            'application/xml',
+                            'text/html']
+        if 'Accept' in self.request.headers:
+            accept_hdr = self.request.headers['Accept']
+        else:
+            accept_hdr = '*/*'
+        best_mtype = mimeparse.best_match(supported_mtypes, accept_hdr)
+        if best_mtype == 'text/html':
+            self.response.headers['Content-Type'] = 'text/html;charset=utf-8'
+            basedir = os.path.dirname(__file__)
+            template_file = os.path.join(basedir, "..", "templates",
+                                         "home.html")
+            self.response.write(template.render(template_file, {}))
+        else:
+            self.response.headers['Content-Type'] = 'application/atomsvc+xml'
+            self.response.write(servicedoc.generate_service_doc())
