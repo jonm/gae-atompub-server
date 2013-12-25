@@ -14,6 +14,7 @@
 
 import mimeparse.mimeparse as mimeparse
 import os
+import urlparse
 import webapp2
 
 from google.appengine.ext.webapp import template
@@ -21,6 +22,10 @@ from google.appengine.ext.webapp import template
 import servicedoc
 
 class HomeHandler(webapp2.RequestHandler):
+    def _get_baseurl(self):
+        parts = urlparse.urlparse(self.request.url)
+        return "%s://%s" % (parts.scheme, parts.netloc)
+
     def get(self):
         supported_mtypes = ['application/atomsvc+xml',
                             'application/xml',
@@ -38,4 +43,5 @@ class HomeHandler(webapp2.RequestHandler):
             self.response.write(template.render(template_file, {}))
         else:
             self.response.headers['Content-Type'] = 'application/atomsvc+xml'
-            self.response.write(servicedoc.generate_service_doc())
+            baseurl = self._get_baseurl()
+            self.response.write(servicedoc.generate_service_doc(baseurl))

@@ -12,20 +12,24 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from lxml import etree
+try:
+    from lxml import etree
+except ImportError:
+    import xml.etree.ElementTree as etree
 
 APP_NS = 'http://www.w3.org/2007/app'
 ATOM_NS = 'http://www.w3.org/2005/Atom'
 
-def generate_service_doc():
+def generate_service_doc(baseurl):
     doc = etree.Element("{%s}service" % APP_NS)
+    doc.attrib['xml:base'] = baseurl
     ws = etree.Element("{%s}workspace" % APP_NS)
     doc.append(ws)
     title = etree.Element("{%s}title" % ATOM_NS)
     title.text = "Default Workspace"
     ws.append(title)
     coll = etree.Element("{%s}collection" % APP_NS)
-    coll.attrib['href'] = 'http://example.org/posts'
+    coll.attrib['href'] = '/posts'
     ctitle = etree.Element("{%s}title" % ATOM_NS)
     ctitle.text = "Posts"
     coll.append(ctitle)
