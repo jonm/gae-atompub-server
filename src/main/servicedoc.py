@@ -37,4 +37,4 @@ def generate_service_doc(baseurl):
     accept.text = "*/*"
     coll.append(accept)
     ws.append(coll)
-    return etree.tostring(doc)
+    return doc

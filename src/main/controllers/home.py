@@ -12,6 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+import logging
 import mimeparse.mimeparse as mimeparse
 import os
 import urlparse
@@ -19,6 +20,8 @@ import webapp2
 
 from google.appengine.ext.webapp import template
 
+from views.html_view import HtmlView
+from views.xml_view import AtomServiceDocumentView
 import servicedoc
 
 class HomeHandler(webapp2.RequestHandler):
@@ -36,12 +39,10 @@ class HomeHandler(webapp2.RequestHandler):
             accept_hdr = '*/*'
         best_mtype = mimeparse.best_match(supported_mtypes, accept_hdr)
         if best_mtype == 'text/html':
-            self.response.headers['Content-Type'] = 'text/html;charset=utf-8'
-            basedir = os.path.dirname(__file__)
-            template_file = os.path.join(basedir, "..", "templates",
-                                         "home.html")
-            self.response.write(template.render(template_file, {}))
+            view = HtmlView("home.html", {})
         else:
-            self.response.headers['Content-Type'] = 'application/atomsvc+xml'
             baseurl = self._get_baseurl()
-            self.response.write(servicedoc.generate_service_doc(baseurl))
+            view = AtomServiceDocumentView(servicedoc.generate_service_doc(baseurl))
+
+        self.response.headers['Content-Type'] = view.get_content_type()
+        view.render(self.response.out)
