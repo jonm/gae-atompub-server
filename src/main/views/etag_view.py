@@ -11,22 +11,21 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-import os
-
-from google.appengine.ext.webapp import template
 
 from abstract_view import AbstractView
+from hashbuf import HashingWriteBuffer
 
-class HtmlView(AbstractView):
-    def __init__(self, template_name, model):
-        self._template_name = template_name
-        self._model = model
+class EtagView(AbstractView):
+    def __init__(self, wrapped):
+        self._wrapped = wrapped
+        self._etag = None
 
-    def get_content_type(self):
-        return "text/html;charset=utf-8"
-
+    def get_content_type(self): return self._wrapped.get_content_type()
+    
     def render(self, out):
-        basedir = os.path.dirname(__file__)
-        t_file = os.path.join(basedir, "..", "templates",
-                              self._template_name)
-        out.write(template.render(t_file, self._model))
+        f = HashingWriteBuffer(out)
+        self._wrapped.render(f)
+        self._etag = f.hexdigest()
+    
+    def get_etag(self):
+        return self._etag

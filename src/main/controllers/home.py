@@ -20,6 +20,7 @@ import webapp2
 
 from google.appengine.ext.webapp import template
 
+from views.etag_view import EtagView
 from views.html_view import HtmlView
 from views.xml_view import AtomServiceDocumentView
 import servicedoc
@@ -44,5 +45,7 @@ class HomeHandler(webapp2.RequestHandler):
             baseurl = self._get_baseurl()
             view = AtomServiceDocumentView(servicedoc.generate_service_doc(baseurl))
 
+        view = EtagView(view)
         self.response.headers['Content-Type'] = view.get_content_type()
         view.render(self.response.out)
+        self.response.headers['Etag'] = "\"%s\"" % (view.get_etag(),)
