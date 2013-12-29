@@ -7,4 +7,4 @@ Development Requirements
 ========================
 * Google App Engine SDK
 * Rake
-
+* lxml (e.g. "pip install lxml")
