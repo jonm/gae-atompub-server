@@ -19,10 +19,11 @@ except ImportError:
 
 APP_NS = 'http://www.w3.org/2007/app'
 ATOM_NS = 'http://www.w3.org/2005/Atom'
+XML_NS = 'http://www.w3.org/XML/1998/namespace'
 
 def generate_service_doc(baseurl):
     doc = etree.Element("{%s}service" % APP_NS)
-    doc.attrib['xml:base'] = baseurl
+    doc.set("{%s}base" % XML_NS, baseurl)
     ws = etree.Element("{%s}workspace" % APP_NS)
     doc.append(ws)
     title = etree.Element("{%s}title" % ATOM_NS)
